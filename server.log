@@ -1,16 +1,18 @@
+nohup: ignoring input
  * Serving Flask app 'app'
  * Debug mode: off
 WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
  * Running on all addresses (0.0.0.0)
  * Running on http://127.0.0.1:7860
- * Running on http://21.0.16.126:7860
+ * Running on http://21.0.8.226:7860
 Press CTRL+C to quit
-127.0.0.1 - - [09/Oct/2026 14:34:31] "POST /api/pero/generate_template HTTP/1.1" 200 -
-127.0.0.1 - - [09/Oct/2026 14:34:31] "POST /api/pero/generate_template HTTP/1.1" 200 -
-127.0.0.1 - - [09/Oct/2026 14:34:31] "POST /api/pero/generate_template HTTP/1.1" 200 -
-127.0.0.1 - - [09/Oct/2026 14:34:38] "POST /api/pero/generate_template HTTP/1.1" 200 -
-127.0.0.1 - - [09/Oct/2026 14:34:38] "POST /api/mile/design_campaign HTTP/1.1" 200 -
-127.0.0.1 - - [09/Oct/2026 14:34:43] "POST /api/mile/analyze_metrics HTTP/1.1" 200 -
-127.0.0.1 - - [09/Oct/2026 14:34:43] "POST /api/mile/analyze_metrics HTTP/1.1" 200 -
-127.0.0.1 - - [09/Oct/2026 14:34:51] "GET /api/dashboard HTTP/1.1" 200 -
-127.0.0.1 - - [09/Oct/2026 14:34:56] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [09/Oct/2026 23:05:11] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [09/Oct/2026 23:05:11] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [09/Oct/2026 23:05:16] "POST /api/ladi/research_company HTTP/1.1" 400 -
+127.0.0.1 - - [09/Oct/2026 23:05:19] "POST /api/pero/generate_template HTTP/1.1" 200 -
+127.0.0.1 - - [09/Oct/2026 23:05:19] "POST /api/mile/analyze_metrics HTTP/1.1" 200 -
+127.0.0.1 - - [09/Oct/2026 23:05:19] "GET /api/dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [09/Oct/2026 23:05:25] "POST /api/ladi/research_company HTTP/1.1" 200 -
+127.0.0.1 - - [09/Oct/2026 23:05:25] "POST /api/ladi/research_client HTTP/1.1" 200 -
+127.0.0.1 - - [09/Oct/2026 23:05:29] "POST /api/mile/design_campaign HTTP/1.1" 200 -
+127.0.0.1 - - [09/Oct/2026 23:05:30] "POST /api/pero/learn_web HTTP/1.1" 200 -
