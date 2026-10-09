@@ -8,8 +8,9 @@ from __future__ import annotations
 import json
 import os
 import sqlite3
+from contextlib import contextmanager
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Iterator
 
 DB_PATH = os.environ.get(
     "AGENTS_DB",
@@ -21,11 +22,21 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
-def get_conn() -> sqlite3.Connection:
+@contextmanager
+def get_conn() -> Iterator[sqlite3.Connection]:
+    """Open a connection, commit (or roll back) the transaction, always close.
+
+    Every caller uses `with get_conn() as conn:`, so the previous version leaked
+    one open SQLite handle per call — this closes them again on exit.
+    """
     os.makedirs(os.path.dirname(os.path.abspath(DB_PATH)), exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
-    return conn
+    try:
+        with conn:  # commit on success, roll back on exception
+            yield conn
+    finally:
+        conn.close()
 
 
 SCHEMA = """

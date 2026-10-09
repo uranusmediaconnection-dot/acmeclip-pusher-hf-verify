@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import urllib.error
 import urllib.parse
@@ -10,6 +11,9 @@ from html.parser import HTMLParser
 from typing import Any
 
 USER_AGENT = "Mozilla/5.0 (compatible; MarketingAgents/1.0)"
+
+# Repository root — the folder that holds knowledge_base.json / app.py.
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class _TextExtractor(HTMLParser):
@@ -126,22 +130,61 @@ def search_duckduckgo(query: str, max_results: int = 5) -> list[dict[str, str]]:
         data = fetch_url(url, timeout=8)["text"]
     except Exception:
         return []
+    # The text extraction flattens the result markup, so rank the surviving
+    # sentences by length and return them as snippets.
     results = []
-    for m in re.finditer(r"result__a", data):
-        pass  # text extraction already flattened structure; use simpler heuristic below
-    # Fallback: split sentences containing meaningful snippets
     snippets = [s.strip() for s in re.split(r"(?<=[.!?])\s+", data) if 40 < len(s.strip()) < 300]
     for s in snippets[:max_results]:
         results.append({"query": query, "snippet": s})
     return results
 
 
+# The knowledge base ships with the repository next to app.py. The absolute
+# /workspace path is kept as a fallback for the original HF Space layout, and
+# KNOWLEDGE_BASE lets a deployment point somewhere else entirely.
+_KB_PATH_CANDIDATES = (
+    os.environ.get("KNOWLEDGE_BASE"),
+    os.path.join(REPO_ROOT, "knowledge_base.json"),
+    "/workspace/knowledge_base.json",
+)
+
+# path -> (mtime, parsed document); keeps repeated calls cheap while still
+# picking up edits made to the file while the server is running.
+_kb_cache: dict[str, tuple[float, dict[str, Any]]] = {}
+
+
+def knowledge_base_path() -> str | None:
+    """Return the first existing knowledge_base.json candidate, or None."""
+    for candidate in _KB_PATH_CANDIDATES:
+        if candidate and os.path.isfile(candidate):
+            return candidate
+    return None
+
+
 def load_knowledge_base() -> dict[str, Any]:
-    path = "/workspace/knowledge_base.json"
+    """Load frameworks / tones / goals / benchmarks.
+
+    Returns {} when no knowledge base is present so callers can fall back to
+    their own defaults instead of crashing.
+    """
+    path = knowledge_base_path()
+    if path is None:
+        return {}
+    try:
+        mtime = os.path.getmtime(path)
+    except OSError:
+        return {}
+    cached = _kb_cache.get(path)
+    if cached is not None and cached[0] == mtime:
+        return cached[1]
     try:
         with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
     except FileNotFoundError:
         return {}
     except json.JSONDecodeError as e:
         return {"_error": f"knowledge_base.json is corrupt: {e}"}
+    if isinstance(data, dict):
+        _kb_cache[path] = (mtime, data)
+    return data if isinstance(data, dict) else {}
+

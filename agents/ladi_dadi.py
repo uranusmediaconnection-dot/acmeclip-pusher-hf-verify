@@ -84,8 +84,6 @@ def research_company(payload: dict[str, Any]) -> dict[str, Any]:
         bio = f"{name} works in {industry_label}."
         if vps:
             bio += " Observed value propositions: " + "; ".join(vps[:2]) + "."
-        if payload.get("notes"):
-            bio += f" Provided context: {payload['notes']}"
         identity = {
             "positioning": (vps[0] if vps else f"{name} — {analysis.get('industry_guess')} player"),
             "communication_tone": analysis.get("tone", "formal"),
@@ -98,6 +96,13 @@ def research_company(payload: dict[str, Any]) -> dict[str, Any]:
         fb = _fallback_profile(name, payload.get("industry"))
         bio, identity, confidence = fb["bio"], fb["identity"], fb["confidence"]
         sources = fb["sources"]
+
+    # Operator-supplied context belongs in the BIO on both paths. It used to be
+    # appended only in the live-web branch, so the offline fallback silently
+    # dropped it while claiming to be built from "the local knowledge base and
+    # stated inputs".
+    if payload.get("notes"):
+        bio += f" Provided context: {payload['notes']}"
 
     record = {
         "name": name,
