@@ -1,5 +1,2 @@
-data/
-server.log
-__pycache__/
-agents/__pycache__/
-*.pyc
+# Logs and temp files
+*.log
