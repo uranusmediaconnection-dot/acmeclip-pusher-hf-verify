@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Marketing Specialist Agents — Live Preview</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#171e2e; --panel2:#1d2639; --line:#2a3550;
+    --text:#e8edf7; --muted:#8b98b3; --accent:#5aa7ff; --green:#3ddc84;
+    --amber:#ffc24b; --red:#ff6b6b; --mono:'Courier New',monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+  header{padding:20px 28px;background:linear-gradient(90deg,#141b2b,#1b2440);border-bottom:1px solid var(--line)}
+  header h1{margin:0;font-size:20px}
+  header p{margin:6px 0 0;color:var(--muted);font-size:13px}
+  .agents{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
+  .chip{background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:6px 14px;font-size:13px}
+  .chip b{color:var(--accent)}
+  main{display:grid;grid-template-columns:420px 1fr;gap:20px;padding:20px 28px;max-width:1500px;margin:0 auto}
+  @media (max-width:1000px){main{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+  .card h2{margin:0 0 4px;font-size:15px}
+  .card .sub{color:var(--muted);font-size:12px;margin-bottom:12px}
+  label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+  input,select,textarea{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit}
+  textarea{min-height:60px;resize:vertical}
+  button{margin-top:12px;background:var(--accent);border:none;color:#08101f;font-weight:700;
+    padding:9px 16px;border-radius:8px;cursor:pointer;font-size:13px}
+  button:hover{filter:brightness(1.1)}
+  button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+  .row{display:flex;gap:10px}.row>*{flex:1}
+  pre.out{background:#0b101c;border:1px solid var(--line);border-radius:8px;padding:12px;
+    font-family:var(--mono);font-size:12px;white-space:pre-wrap;word-break:break-word;max-height:340px;overflow:auto;margin-top:12px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:1300px){.grid2{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+  th{color:var(--muted);font-weight:600}
+  .pill{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600}
+  .good{background:#123a26;color:var(--green)} .ok{background:#3a3212;color:var(--amber)}
+  .bad{background:#3a1518;color:var(--red)} .neutral{background:var(--panel2);color:var(--muted)}
+  .bar{height:8px;border-radius:4px;background:var(--panel2);overflow:hidden;margin-top:4px}
+  .bar>div{height:100%;background:var(--accent)}
+  .toast{position:fixed;bottom:20px;right:20px;background:var(--green);color:#08101f;
+    padding:12px 18px;border-radius:10px;font-weight:700;opacity:0;transition:.3s;pointer-events:none;z-index:9}
+  .toast.err{background:var(--red);color:#fff}
+  .toast.show{opacity:1}
+  .muted{color:var(--muted)} .small{font-size:12px}
+  h3.sec{font-size:13px;color:var(--accent);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.06em}
+</style>
+</head>
+<body>
+<header>
+  <h1>🤖 Marketing Specialist Agents — Live Preview</h1>
+  <p>Three cooperating agents with a shared SQLite memory and web learning.</p>
+  <div class="agents">
+    <span class="chip">📝 <b>Pero Dactil</b> — Email Templates (web + DB learning)</span>
+    <span class="chip">🕵️ <b>Ladi Dadi</b> — Strategist: company &amp; client BIO/identity research</span>
+    <span class="chip">📊 <b>Mile Panika</b> — Campaign strategy, analytics &amp; data health</span>
+  </div>
+</header>
+
+<main>
+  <!-- ================= LEFT: agent controls ================= -->
+  <section>
+
+    <div class="card">
+      <h2>🕵️ Ladi Dadi — Research Company</h2>
+      <div class="sub">Fetches the website live, extracts industry / value props / tone, stores BIO + identity.</div>
+      <label>Company name *</label><input id="co-name" placeholder="Acme Robotics"/>
+      <div class="row">
+        <div><label>Website</label><input id="co-web" placeholder="https://acme.com"/></div>
+        <div><label>Industry hint</label><input id="co-ind" placeholder="technology"/></div>
+      </div>
+      <label>Notes</label><input id="co-notes" placeholder="Series B, sells warehouse robots"/>
+      <button onclick="researchCompany()">Research company</button>
+      <pre class="out" id="co-out">—</pre>
+    </div>
+
+    <div class="card">
+      <h2>🕵️ Ladi Dadi — Research Client</h2>
+      <div class="sub">Builds a contact BIO + identity profile (decision style, pain points, preferred tone).</div>
+      <div class="row">
+        <div><label>Full name *</label><input id="cl-name" placeholder="Maria Kovac"/></div>
+        <div><label>Role</label><input id="cl-role" placeholder="VP Operations"/></div>
+      </div>
+      <div class="row">
+        <div><label>Company (from DB)</label><input id="cl-co" placeholder="Acme Robotics"/></div>
+        <div><label>Email</label><input id="cl-mail" placeholder="maria@acme.com"/></div>
+      </div>
+      <label>Interests (comma separated)</label><input id="cl-int" placeholder="automation, lean logistics"/>
+      <button onclick="researchClient()">Research client</button>
+      <pre class="out" id="cl-out">—</pre>
+    </div>
+
+    <div class="card">
+      <h2>📝 Pero Dactil — Generate Email Template</h2>
+      <div class="sub">Learns from the web + database learnings, then writes a scored template (AIDA/PAS/BAB).</div>
+      <div class="row">
+        <div><label>Goal</label>
+          <select id="tp-goal">
+            <option>cold_outreach</option><option>follow_up</option><option>newsletter</option>
+            <option>re_engagement</option><option>demo_request</option>
+          </select></div>
+        <div><label>Tone</label>
+          <select id="tp-tone"><option>professional</option><option>friendly</option>
+            <option>energetic</option><option>formal</option></select></div>
+      </div>
+      <div class="row">
+        <div><label>First name</label><input id="tp-first" placeholder="Maria"/></div>
+        <div><label>Company</label><input id="tp-co" placeholder="Acme Robotics"/></div>
+      </div>
+      <div class="row">
+        <div><label>Pain point</label><input id="tp-pain" placeholder="manual inventory reports"/></div>
+        <div><label>Area</label><input id="tp-area" placeholder="warehouse automation"/></div>
+      </div>
+      <label>Value prop</label><input id="tp-vp" placeholder="cut reporting busywork in half"/>
+      <div class="row">
+        <button onclick="genTemplate(true)">Learn from web + generate</button>
+        <button class="secondary" onclick="genTemplate(false)">Generate (DB only)</button>
+      </div>
+      <button class="secondary" onclick="learnWeb()">🌐 Force fresh web learning</button>
+      <pre class="out" id="tp-out">—</pre>
+    </div>
+
+    <div class="card">
+      <h2>📊 Mile Panika — Design Campaign</h2>
+      <div class="sub">Creates a strategy (cadence, KPIs, channel mix) and attaches stored templates.</div>
+      <div class="row">
+        <div><label>Campaign name *</label><input id="cp-name" placeholder="Q4 Acme push"/></div>
+        <div><label>Daily goal</label><input id="cp-daily" type="number" value="50"/></div>
+      </div>
+      <label>Objective</label><input id="cp-obj" placeholder="book qualified demos"/>
+      <button onclick="designCampaign()">Design campaign</button>
+      <pre class="out" id="cp-out">—</pre>
+    </div>
+
+    <div class="card">
+      <h2>📊 Mile Panika — Record &amp; Analyze Metrics</h2>
+      <div class="sub">Computes rates, runs DATA HEALTH checks and gives verdicts + recommendations.</div>
+      <div class="row">
+        <div><label>Campaign ID *</label><input id="mt-cid" type="number" placeholder="1"/></div>
+        <div><label>Sent *</label><input id="mt-sent" type="number" value="500"/></div>
+      </div>
+      <div class="row">
+        <div><label>Opens</label><input id="mt-opens" type="number" value="210"/></div>
+        <div><label>Clicks</label><input id="mt-clicks" type="number" value="45"/></div>
+        <div><label>Replies</label><input id="mt-replies" type="number" value="18"/></div>
+      </div>
+      <div class="row">
+        <div><label>Bounces</label><input id="mt-bounce" type="number" value="4"/></div>
+        <div><label>Unsubs</label><input id="mt-uns" type="number" value="1"/></div>
+        <div><label>Conv.</label><input id="mt-conv" type="number" value="3"/></div>
+      </div>
+      <button onclick="analyzeMetrics()">Analyze metrics</button>
+      <pre class="out" id="mt-out">—</pre>
+    </div>
+
+  </section>
+
+  <!-- ================= RIGHT: dashboard ================= -->
+  <section>
+    <div class="card">
+      <h2>📁 Shared Database <button class="secondary" style="margin:0;float:right;padding:4px 12px" onclick="refresh()">↻ Refresh</button></h2>
+      <div class="sub">Everything the agents produce is persisted to SQLite (<code>data/agents.db</code>) and shown here live.</div>
+    </div>
+
+    <div class="grid2">
+      <div class="card"><h3 class="sec">Companies (BIO + identity)</h3><div id="dash-companies" class="small muted">loading…</div></div>
+      <div class="card"><h3 class="sec">Clients</h3><div id="dash-clients" class="small muted">loading…</div></div>
+    </div>
+
+    <div class="card"><h3 class="sec">Email Templates</h3><div id="dash-templates" class="small muted">loading…</div></div>
+
+    <div class="card"><h3 class="sec">Campaigns · Analytics · Data Health</h3><div id="dash-campaigns" class="small muted">loading…</div></div>
+
+    <div class="grid2">
+      <div class="card"><h3 class="sec">Agent Learnings (web + DB)</h3><div id="dash-learnings" class="small muted">loading…</div></div>
+      <div class="card"><h3 class="sec">Recent Agent Runs</h3><div id="dash-runs" class="small muted">loading…</div></div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+function toast(msg, err=false){
+  const t = $("toast"); t.textContent = msg; t.className = "toast show" + (err ? " err" : "");
+  setTimeout(()=>t.className="toast", 2600);
+}
+async function post(url, body){
+  const r = await fetch(url, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body||{})});
+  const j = await r.json();
+  if(!j.ok) throw new Error(j.error || "request failed");
+  return j;
+}
+function esc(s){return String(s??"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function pct(v){return v==null ? "—" : (v*100).toFixed(1)+"%";}
+function bandPill(b){
+  const cls = {good:"good", ok:"ok", underperforming:"bad", no_data:"neutral"}[b] || "neutral";
+  return `<span class="pill ${cls}">${esc(b)}</span>`;
+}
+
+async function researchCompany(){
+  $("co-out").textContent = "⏳ researching…";
+  try{
+    const j = await post("/api/ladi/research_company", {
+      name:$("co-name").value, website:$("co-web").value,
+      industry:$("co-ind").value, notes:$("co-notes").value});
+    $("co-out").textContent = JSON.stringify(j.result, null, 2);
+    toast(`Ladi Dadi stored company #${j.result.company_id}`); refresh();
+  }catch(e){$("co-out").textContent = "❌ "+e.message; toast(e.message,true);}
+}
+async function researchClient(){
+  $("cl-out").textContent = "⏳ researching…";
+  try{
+    const j = await post("/api/ladi/research_client", {
+      full_name:$("cl-name").value, role:$("cl-role").value, company:$("cl-co").value,
+      email:$("cl-mail").value, interests:$("cl-int").value.split(",").map(s=>s.trim()).filter(Boolean)});
+    $("cl-out").textContent = JSON.stringify(j.result, null, 2);
+    toast(`Ladi Dadi stored client #${j.result.client_id}`); refresh();
+  }catch(e){$("cl-out").textContent = "❌ "+e.message; toast(e.message,true);}
+}
+async function genTemplate(web){
+  $("tp-out").textContent = web ? "⏳ Pero is reading the web first…" : "⏳ writing…";
+  try{
+    const j = await post("/api/pero/generate_template", {
+      goal:$("tp-goal").value, tone:$("tp-tone").value, learn_from_web:web,
+      first_name:$("tp-first").value, company:$("tp-co").value,
+      pain_point:$("tp-pain").value, area:$("tp-area").value, value_prop:$("tp-vp").value});
+    const r = j.result;
+    $("tp-out").textContent =
+`Subject : ${r.subject}
+Quality : ${r.quality_score}/100   Variables: ${r.variables.join(", ")||"-"}
+Learnings applied:
+${r.learnings_used.map(x=>" • "+x).join("\n")}
+${web ? "\nWeb report: fetched="+r.web_learning_report.fetched.length+" failed="+r.web_learning_report.failed.length+" new insights="+r.web_learning_report.new_insights : ""}
+
+${r.body}`;
+    toast(`Pero Dactil saved template #${r.template_id}`); refresh();
+  }catch(e){$("tp-out").textContent = "❌ "+e.message; toast(e.message,true);}
+}
+async function learnWeb(){
+  $("tp-out").textContent = "⏳ fetching best-practice pages…";
+  try{
+    const j = await post("/api/pero/learn_web", {});
+    $("tp-out").textContent = JSON.stringify(j.report, null, 2);
+    toast(`Web learning done: ${j.report.new_insights} new insights (${j.report.failed.length} pages unreachable)`);
+    refresh();
+  }catch(e){$("tp-out").textContent = "❌ "+e.message; toast(e.message,true);}
+}
+async function designCampaign(){
+  $("cp-out").textContent = "⏳ designing…";
+  try{
+    const j = await post("/api/mile/design_campaign", {
+      name:$("cp-name").value, objective:$("cp-obj").value, daily_goal:Number($("cp-daily").value||50)});
+    $("cp-out").textContent = JSON.stringify(j.result, null, 2);
+    $("mt-cid").value = j.result.campaign_id;
+    toast(`Mile Panika created campaign #${j.result.campaign_id}`); refresh();
+  }catch(e){$("cp-out").textContent = "❌ "+e.message; toast(e.message,true);}
+}
+async function analyzeMetrics(){
+  $("mt-out").textContent = "⏳ analyzing…";
+  try{
+    const j = await post("/api/mile/analyze_metrics", {
+      campaign_id:Number($("mt-cid").value), sent:Number($("mt-sent").value||0),
+      opens:Number($("mt-opens").value||0), clicks:Number($("mt-clicks").value||0),
+      replies:Number($("mt-replies").value||0), bounces:Number($("mt-bounce").value||0),
+      unsubscribes:Number($("mt-uns").value||0), conversions:Number($("mt-conv").value||0)});
+    $("mt-out").textContent = JSON.stringify(j.result, null, 2);
+    toast(`Analysis done — health score ${j.result.data_health.score}/100`); refresh();
+  }catch(e){$("mt-out").textContent = "❌ "+e.message; toast(e.message,true);}
+}
+
+async function refresh(){
+  try{
+    const j = await fetch("/api/dashboard").then(r=>r.json());
+    if(!j.ok) throw new Error(j.error);
+    const d = j.data;
+
+    $("dash-companies").innerHTML = d.companies.length ? d.companies.map(c=>`
+      <div style="border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px">
+        <b>#${c.id} ${esc(c.name)}</b> <span class="pill neutral">${esc(c.industry||"?")}</span>
+        <span class="muted small">confidence ${(c.confidence*100).toFixed(0)}%</span>
+        <div class="small" style="margin-top:6px">${esc(c.bio)}</div>
+        <div class="small muted" style="margin-top:4px">tone: ${esc(c.identity.communication_tone||"—")} · positioning: ${esc(c.identity.positioning||"—")} · sources: ${esc((c.sources||[]).join(", "))}</div>
+      </div>`).join("") : "<i>No companies yet — run Ladi Dadi's company research.</i>";
+
+    $("dash-clients").innerHTML = d.clients.length ? `<table><tr><th>ID</th><th>Name</th><th>Role</th><th>Bio</th><th>Identity</th></tr>`+
+      d.clients.map(cl=>`<tr><td>${cl.id}</td><td>${esc(cl.full_name)}</td><td>${esc(cl.role)}</td>
+        <td style="max-width:220px">${esc(cl.bio)}</td>
+        <td class="muted">${esc(cl.identity.decision_style||"")} · pains: ${esc((cl.identity.likely_pain_points||[]).join(", "))}</td></tr>`).join("")+"</table>"
+      : "<i>No clients yet.</i>";
+
+    $("dash-templates").innerHTML = d.templates.length ? d.templates.map(t=>`
+      <div style="border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px">
+        <b>#${t.id} ${esc(t.subject)}</b>
+        <span class="pill ${t.quality_score>=75?"good":t.quality_score>=60?"ok":"bad"}">quality ${t.quality_score}</span>
+        <span class="pill neutral">${esc(t.goal)}</span><span class="pill neutral">${esc(t.tone)}</span>
+        <pre class="out" style="max-height:160px;margin-top:8px">${esc(t.body)}</pre>
+        <div class="small muted">learnings used: ${esc((t.learnings_used||[]).slice(0,3).join(" | "))}</div>
+      </div>`).join("") : "<i>No templates yet — ask Pero Dactil to write one.</i>";
+
+    $("dash-campaigns").innerHTML = d.campaigns.length ? d.campaigns.map(x=>{
+      const a = x.analysis;
+      return `<div style="border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px">
+        <b>#${x.campaign.id} ${esc(x.campaign.name)}</b> <span class="pill neutral">${esc(x.campaign.status)}</span>
+        <div class="small muted">objective: ${esc(x.campaign.objective)} · templates: ${esc(JSON.stringify(x.campaign.template_ids))}
+        · cadence: ${esc((x.campaign.strategy.cadence||[]).join(" → "))}</div>
+        ${a ? `
+        <table style="margin-top:8px"><tr><th>open</th><th>click</th><th>reply</th><th>bounce</th><th>health</th></tr>
+        <tr><td>${pct(a.rates.open_rate)} ${bandPill(a.verdict.open_rate)}</td>
+            <td>${pct(a.rates.click_rate)} ${bandPill(a.verdict.click_rate)}</td>
+            <td>${pct(a.rates.reply_rate)} ${bandPill(a.verdict.reply_rate)}</td>
+            <td>${pct(a.rates.bounce_rate)}</td>
+            <td><span class="pill ${a.data_health.score>=80?"good":a.data_health.score>=50?"ok":"bad"}">${a.data_health.score}/100</span></td></tr></table>
+        ${a.data_health.issues.map(i=>`<div class="small" style="color:var(--red)">⛔ ${esc(i)}</div>`).join("")}
+        ${a.data_health.warnings.map(w=>`<div class="small" style="color:var(--amber)">⚠️ ${esc(w)}</div>`).join("")}
+        ${a.recommendations.map(r=>`<div class="small">💡 ${esc(r)}</div>`).join("")}`
+        : `<div class="small muted">No metrics recorded yet — use Mile Panika's analyzer.</div>`}
+      </div>`;}).join("") : "<i>No campaigns yet — let Mile Panika design one.</i>";
+
+    $("dash-learnings").innerHTML = d.learnings.map(l=>`
+      <div style="margin-bottom:6px"><span class="pill neutral">${esc(l.topic)}</span>
+      <span class="small">${esc(l.insight)}</span>
+      <div class="small muted">source: ${esc(l.source)} · used ${l.times_used}×</div></div>`).join("") || "<i>none</i>";
+
+    $("dash-runs").innerHTML = d.runs.length ? `<table><tr><th>Agent</th><th>Action</th><th>Status</th><th>ms</th><th>When</th></tr>`+
+      d.runs.slice(0,15).map(r=>`<tr><td>${esc(r.agent)}</td><td>${esc(r.action)}</td>
+        <td><span class="pill ${r.status==="ok"?"good":"bad"}">${esc(r.status)}</span></td>
+        <td>${r.duration_ms}</td><td class="muted">${esc(r.created_at)}</td></tr>`).join("")+"</table>"
+      : "<i>no runs yet.</i>";
+  }catch(e){ console.error(e); toast("dashboard error: "+e.message, true); }
+}
+refresh();
+</script>
+</body>
+</html>
