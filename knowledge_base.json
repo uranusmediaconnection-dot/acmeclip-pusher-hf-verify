@@ -1,0 +1,40 @@
+{
+  "frameworks": {
+    "aida": {
+      "name": "AIDA",
+      "steps": ["Attention", "Interest", "Desire", "Action"],
+      "notes": "Classic funnel copy framework; strong for cold outreach."
+    },
+    "pas": {
+      "name": "PAS",
+      "steps": ["Problem", "Agitate", "Solution"],
+      "notes": "Great when the client has a known pain point."
+    },
+    "bab": {
+      "name": "BAB",
+      "steps": ["Before", "After", "Bridge"],
+      "notes": "Good for case-study-driven emails."
+    }
+  },
+  "tones": {
+    "professional": {"greeting": "Hello {first_name},", "signoff": "Kind regards,"},
+    "friendly": {"greeting": "Hi {first_name}!", "signoff": "Cheers,"},
+    "energetic": {"greeting": "Hey {first_name}!", "signoff": "Talk soon!"},
+    "formal": {"greeting": "Dear {title} {last_name},", "signoff": "Sincerely,"}
+  },
+  "goals": {
+    "cold_outreach": {"cta": "Are you open to a quick 15-minute call next week?", "persistence": 3},
+    "follow_up": {"cta": "Would it help if I sent a short case study relevant to your team?", "persistence": 2},
+    "newsletter": {"cta": "Read this week's full story here.", "persistence": 0},
+    "re_engagement": {"cta": "Is this still a priority for you this quarter?", "persistence": 4},
+    "demo_request": {"cta": "You can grab a time that works for you here: {booking_link}", "persistence": 1}
+  },
+  "benchmarks": {
+    "email": {
+      "open_rate_good": 0.45, "open_rate_min": 0.30,
+      "click_rate_good": 0.08, "click_rate_min": 0.025,
+      "reply_rate_good": 0.05, "reply_rate_min": 0.015,
+      "bounce_max": 0.02, "unsubscribe_max": 0.005
+    }
+  }
+}
