@@ -1,2 +1,5 @@
-# Logs and temp files
+# Logs
 *.log
+
+# Database files (if generated)
+data/agents.db
