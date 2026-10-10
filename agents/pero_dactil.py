@@ -135,6 +135,24 @@ _BODY_TEMPLATES = {
 }
 
 
+def _greeting(tone_pack: dict[str, Any], first_name: str, last_name: str, title: str) -> str:
+    """Render a tone's greeting without leaving empty placeholder holes.
+
+    The `formal` pack is "Dear {title} {last_name}," — with no title supplied that
+    used to render as "Dear  Maria," (double space), so collapse the gap and fall
+    back to the first name when nothing else is known.
+    """
+    raw = tone_pack.get("greeting") or f"Hi {first_name},"
+    try:
+        text = raw.format(first_name=first_name, title=title, last_name=last_name or first_name)
+    except (KeyError, IndexError):
+        text = raw
+    text = re.sub(r"\s{2,}", " ", text).strip()
+    if text.startswith("Dear ,"):
+        text = f"Dear {last_name or first_name},"
+    return text
+
+
 def _fill(goal: str, ctx: dict[str, Any], learnings: list[dict[str, Any]]) -> tuple[str, str, list[str]]:
     kb = load_knowledge_base()
     tones = kb.get("tones", {})
@@ -145,12 +163,16 @@ def _fill(goal: str, ctx: dict[str, Any], learnings: list[dict[str, Any]]) -> tu
     tone_pack = tones.get(tone, tones.get("professional", {}))
     goal_pack = goals.get(goal, goals.get("cold_outreach", {}))
 
-    first_name = ctx.get("first_name", "{first_name}")
-    company = ctx.get("company", "{company}")
-    area = ctx.get("area", "growth")
-    pain_point = ctx.get("pain_point", "manual reporting")
-    value_prop = ctx.get("value_prop", "cutting busywork for lean teams")
-    sender = ctx.get("sender", "{sender_name}, {sender_title}")
+    first_name = ctx.get("first_name") or "{first_name}"
+    last_name = ctx.get("last_name") or ""
+    title = ctx.get("title") or ""
+    # `or` (not just .get) so blank form fields fall back to the defaults
+    # instead of rendering empty holes like "Hi ," or "focused on ".
+    company = ctx.get("company") or "{company}"
+    area = ctx.get("area") or "growth"
+    pain_point = ctx.get("pain_point") or "manual reporting"
+    value_prop = ctx.get("value_prop") or "cutting busywork for lean teams"
+    sender = ctx.get("sender") or "{sender_name}, {sender_title}"
 
     used_notes = [l["insight"] for l in learnings]
 
@@ -172,9 +194,7 @@ def _fill(goal: str, ctx: dict[str, Any], learnings: list[dict[str, Any]]) -> tu
     )
 
     parts = {
-        "greeting": tone_pack.get("greeting", f"Hi {first_name},").format(
-            first_name=first_name, title="", last_name=first_name
-        ),
+        "greeting": _greeting(tone_pack, first_name, last_name, title),
         "signoff": tone_pack.get("signoff", "Best,"),
         "sender": sender,
         "action_line": cta,

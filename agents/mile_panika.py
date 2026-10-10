@@ -79,22 +79,20 @@ def _rate(num: float, den: float) -> float | None:
     return round(num / den, 4)
 
 
-def analyze_metrics(payload: dict[str, Any]) -> dict[str, Any]:
-    """Record + analyze campaign metrics and run data-health checks.
+METRIC_FIELDS = ("sent", "opens", "clicks", "replies", "bounces", "unsubscribes", "conversions")
 
-    payload keys: campaign_id (required), sent, opens, clicks, replies,
-                  bounces, unsubscribes, conversions
+
+def _coerce_metrics(raw: dict[str, Any]) -> dict[str, int]:
+    return {k: int(raw.get(k, 0) or 0) for k in METRIC_FIELDS}
+
+
+def evaluate_metrics(campaign_id: int, raw: dict[str, Any]) -> dict[str, Any]:
+    """Pure analysis of one metric snapshot: rates, data health, verdicts, recs.
+
+    Reads nothing from and writes nothing to the database, so it is safe to call
+    from read-only endpoints (e.g. GET /api/dashboard).
     """
-    start = time.time()
-    campaign_id = payload.get("campaign_id")
-    if not campaign_id:
-        db.log_run(AGENT_NAME, "analyze_metrics", payload, {}, status="error", error="missing 'campaign_id'")
-        raise ValueError("analyze_metrics requires a 'campaign_id'")
-
-    m = {k: int(payload.get(k, 0) or 0) for k in
-         ("sent", "opens", "clicks", "replies", "bounces", "unsubscribes", "conversions")}
-    db.record_metrics(int(campaign_id), m)
-
+    m = _coerce_metrics(raw)
     kb = load_knowledge_base()
     bench = kb.get("benchmarks", {}).get("email", {})
 
@@ -114,7 +112,7 @@ def analyze_metrics(payload: dict[str, Any]) -> dict[str, Any]:
     # ---- Data health checks ----
     if m["sent"] <= 0:
         issues.append("sent must be > 0 — all rates are undefined; check the export source.")
-    for field in ("opens", "clicks", "replies", "bounces", "unsubscribes", "conversions"):
+    for field in METRIC_FIELDS[1:]:
         if m[field] < 0:
             issues.append(f"{field} is negative ({m[field]}) — impossible value, fix the pipeline.")
         elif m["sent"] > 0 and m[field] > m["sent"]:
@@ -157,7 +155,7 @@ def analyze_metrics(payload: dict[str, Any]) -> dict[str, Any]:
         recs.append("Metrics healthy — maintain cadence and consider +25% send volume next week.")
 
     health_score = 100 - len(issues) * 25 - len(warnings) * 10
-    out = {
+    return {
         "campaign_id": int(campaign_id),
         "raw": m,
         "rates": rates,
@@ -165,21 +163,39 @@ def analyze_metrics(payload: dict[str, Any]) -> dict[str, Any]:
         "data_health": {"score": max(0, health_score), "issues": issues, "warnings": warnings},
         "recommendations": recs,
     }
+
+
+def analyze_metrics(payload: dict[str, Any]) -> dict[str, Any]:
+    """Record + analyze campaign metrics and run data-health checks.
+
+    payload keys: campaign_id (required), sent, opens, clicks, replies,
+                  bounces, unsubscribes, conversions
+    """
+    start = time.time()
+    campaign_id = payload.get("campaign_id")
+    if not campaign_id:
+        db.log_run(AGENT_NAME, "analyze_metrics", payload, {}, status="error", error="missing 'campaign_id'")
+        raise ValueError("analyze_metrics requires a 'campaign_id'")
+
+    m = _coerce_metrics(payload)
+    db.record_metrics(int(campaign_id), m)
+    out = evaluate_metrics(int(campaign_id), m)
     db.log_run(AGENT_NAME, "analyze_metrics", payload, out, duration_ms=int((time.time() - start) * 1000))
     return out
 
 
 def dashboard_summary() -> dict[str, Any]:
-    """Aggregate numbers for the live preview UI."""
+    """Aggregate numbers for the live preview UI.
+
+    Strictly read-only: it re-evaluates the latest stored metric snapshot
+    instead of calling analyze_metrics(), which would insert a duplicate
+    campaign_metrics row (and an agent_runs row) on every page refresh.
+    """
     campaigns = db.list_campaigns()
     per_campaign = []
     for c in campaigns:
         metric = db.latest_metric(c["id"])
-        analysis = None
-        if metric:
-            fake_payload = {"campaign_id": c["id"], **{k: metric.get(k, 0) for k in
-                            ("sent", "opens", "clicks", "replies", "bounces", "unsubscribes", "conversions")}}
-            analysis = analyze_metrics(fake_payload)
+        analysis = evaluate_metrics(c["id"], metric) if metric else None
         per_campaign.append({"campaign": c, "latest_metric": metric, "analysis": analysis})
     return {
         "companies": db.list_companies(),

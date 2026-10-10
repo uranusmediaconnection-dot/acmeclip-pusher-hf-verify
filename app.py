@@ -5,6 +5,7 @@ Open: http://localhost:7860
 """
 from __future__ import annotations
 
+import os
 import traceback
 
 from flask import Flask, jsonify, render_template, request
@@ -121,4 +122,4 @@ def health():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=7860, debug=False)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 7860)), debug=False)
